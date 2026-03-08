@@ -57,7 +57,7 @@ class ApplicationController extends Controller
     public function show(Application $application): Response
     {
         return Inertia::render('Applications/Show', [
-            'application' => $application->load(['pulse_metrics']),
+            'application' => $application,
         ]);
     }
 
