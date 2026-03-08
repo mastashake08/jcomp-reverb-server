@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import type { BreadcrumbItem } from '@/types'
+import * as ApplicationRoutes from '@/routes/applications'
 
 interface Application {
     id: number
@@ -49,12 +50,12 @@ const getStatusBadgeClass = (status: string): string => {
 
 const deleteApplication = (id: number) => {
     if (confirm('Are you sure you want to delete this application?')) {
-        router.delete(route('applications.destroy', id))
+        router.delete(ApplicationRoutes.destroy.url({ params: { application: id } }))
     }
 }
 
 const toggleStatus = (id: number) => {
-    router.post(route('applications.toggle-status', id))
+    router.post(`/applications/${id}/toggle-status`)
 }
 </script>
 
@@ -68,17 +69,15 @@ const toggleStatus = (id: number) => {
                     Applications Manager
                 </h2>
                 <Link
-                    :href="route('applications.create')"
+                    :href="ApplicationRoutes.create.url()"
                     class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                     Add Application
                 </Link>
             </div>
 
-            <div>
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <!-- Statistics Cards -->
-                <div class="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            <!-- Statistics Cards -->
+            <div class="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
                     <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow dark:bg-gray-800 sm:p-6">
                         <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Total Apps</dt>
                         <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
@@ -135,7 +134,7 @@ const toggleStatus = (id: number) => {
                             </p>
                             <div class="mt-6">
                                 <Link
-                                    :href="route('applications.create')"
+                                    :href="ApplicationRoutes.create.url()"
                                     class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
                                 >
                                     Add Application
@@ -168,7 +167,7 @@ const toggleStatus = (id: number) => {
                                     <tr v-for="app in applications" :key="app.id">
                                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-0">
                                             <Link
-                                                :href="route('applications.show', app.id)"
+                                                :href="ApplicationRoutes.show.url({ params: { application: app.id } })"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                                             >
                                                 {{ app.name }}
@@ -192,7 +191,7 @@ const toggleStatus = (id: number) => {
                                         </td>
                                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                             <Link
-                                                :href="route('applications.edit', app.id)"
+                                                :href="ApplicationRoutes.edit.url({ params: { application: app.id } })"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4"
                                             >
                                                 Edit
@@ -216,7 +215,6 @@ const toggleStatus = (id: number) => {
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     </AppLayout>
 </template>

@@ -2,6 +2,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import type { BreadcrumbItem } from '@/types'
+import * as ApplicationRoutes from '@/routes/applications'
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -19,7 +20,7 @@ const form = useForm({
 })
 
 const submit = () => {
-    form.post(route('applications.store'), {
+    form.post(ApplicationRoutes.store.url(), {
         onSuccess: () => form.reset(),
     })
 }
@@ -35,7 +36,7 @@ const submit = () => {
                     Add New Application
                 </h2>
                 <Link
-                    :href="route('applications.index')"
+                    :href="ApplicationRoutes.index.url()"
                     class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                 >
                     Back to Applications
@@ -177,7 +178,7 @@ const submit = () => {
                         <!-- Actions -->
                         <div class="flex items-center justify-end gap-4">
                             <Link
-                                :href="route('applications.index')"
+                                :href="ApplicationRoutes.index.url()"
                                 class="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                             >
                                 Cancel

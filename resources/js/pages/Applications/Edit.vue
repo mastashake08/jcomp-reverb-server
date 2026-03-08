@@ -2,6 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import type { BreadcrumbItem } from '@/types'
+import * as ApplicationRoutes from '@/routes/applications'
 
 interface Application {
     id: number
@@ -37,7 +38,7 @@ const form = useForm({
 })
 
 const submit = () => {
-    form.put(route('applications.update', props.application.id))
+    form.put(ApplicationRoutes.update.url({ params: { application: props.application.id } }))
 }
 </script>
 
@@ -51,7 +52,7 @@ const submit = () => {
                     Edit Application
                 </h2>
                 <Link
-                    :href="route('applications.show', application.id)"
+                    :href="ApplicationRoutes.show.url({ params: { application: application.id } })"
                     class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                 >
                     Back to Application
@@ -162,7 +163,7 @@ const submit = () => {
                         <!-- Actions -->
                         <div class="flex items-center justify-end gap-4">
                             <Link
-                                :href="route('applications.show', application.id)"
+                                :href="ApplicationRoutes.show.url({ params: { application: application.id } })"
                                 class="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                             >
                                 Cancel
