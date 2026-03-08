@@ -50,7 +50,7 @@ const getStatusBadgeClass = (status: string): string => {
 
 const deleteApplication = (id: number) => {
     if (confirm('Are you sure you want to delete this application?')) {
-        router.delete(ApplicationRoutes.destroy.url({ params: { application: id } }))
+        router.delete(ApplicationRoutes.destroy.url({ application: id }))
     }
 }
 
@@ -167,7 +167,7 @@ const toggleStatus = (id: number) => {
                                     <tr v-for="app in applications" :key="app.id">
                                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-0">
                                             <Link
-                                                :href="ApplicationRoutes.show.url({ params: { application: app.id } })"
+                                                :href="ApplicationRoutes.show.url({ application: app.id })"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                                             >
                                                 {{ app.name }}
@@ -191,7 +191,7 @@ const toggleStatus = (id: number) => {
                                         </td>
                                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                             <Link
-                                                :href="ApplicationRoutes.edit.url({ params: { application: app.id } })"
+                                                :href="ApplicationRoutes.edit.url({ application: app.id })"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4"
                                             >
                                                 Edit

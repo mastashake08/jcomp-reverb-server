@@ -2,10 +2,12 @@
 
 namespace App\Broadcasting\Reverb;
 
-use App\Models\Application;
+use App\Models\Application as ApplicationModel;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Crypt;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
+use Laravel\Reverb\Exceptions\InvalidApplication;
 
 class DatabaseApplicationProvider implements ApplicationProvider
 {
@@ -16,30 +18,44 @@ class DatabaseApplicationProvider implements ApplicationProvider
 
     /**
      * Find an application by ID.
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
-    public function findById(int|string $id): ?object
+    public function findById(string $id): Application
     {
-        return $this->getApplications()->firstWhere('id', $id);
+        $app = $this->getApplications()->first(fn($application) => $application->id() === $id);
+
+        if (! $app) {
+            throw new InvalidApplication;
+        }
+
+        return $app;
     }
 
     /**
      * Find an application by key.
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
-    public function findByKey(string $key): ?object
+    public function findByKey(string $key): Application
     {
-        return $this->getApplications()->firstWhere('key', $key);
+        $app = $this->getApplications()->first(fn($application) => $application->key() === $key);
+
+        if (! $app) {
+            throw new InvalidApplication;
+        }
+
+        return $app;
     }
 
     /**
-     * Find an application by secret.
+     * Find an application by secret (helper method, not part of interface).
      */
-    public function findBySecret(string $secret): ?object
+    public function findBySecret(string $secret): ?Application
     {
-        $applications = $this->getApplications();
-
-        return $applications->first(function ($app) use ($secret) {
+        return $this->getApplications()->first(function ($app) use ($secret) {
             try {
-                return $app->secret === $secret;
+                return $app->secret() === $secret;
             } catch (\Exception $e) {
                 return false;
             }
@@ -49,36 +65,38 @@ class DatabaseApplicationProvider implements ApplicationProvider
     /**
      * Get all active applications.
      */
-    public function all(): array
+    public function all(): Collection
     {
-        return $this->getApplications()->all();
+        return $this->getApplications();
     }
 
     /**
      * Get applications from cache or database.
+     *
+     * @return \Illuminate\Support\Collection<\Laravel\Reverb\Application>
      */
-    protected function getApplications()
+    protected function getApplications(): Collection
     {
         return Cache::remember('reverb.applications', $this->cacheDuration, function () {
-            return Application::active()
+            return ApplicationModel::active()
                 ->get()
-                ->map(function (Application $app) {
-                    return (object) [
-                        'id' => $app->app_id,
-                        'key' => $app->app_key,
-                        'secret' => $app->app_secret, // Already decrypted by accessor
-                        'name' => $app->name,
-                        'capacity' => $app->max_connections,
-                        'options' => array_merge([
+                ->map(function (ApplicationModel $app) {
+                    return new Application(
+                        id: $app->app_id,
+                        key: $app->app_key,
+                        secret: $app->app_secret, // Already decrypted by accessor
+                        pingInterval: 60,
+                        activityTimeout: 30,
+                        allowedOrigins: ['*'], // You can make this configurable per app
+                        maxMessageSize: 10_000,
+                        maxConnections: $app->max_connections,
+                        acceptClientEventsFrom: 'all',
+                        options: array_merge([
                             'host' => parse_url($app->url, PHP_URL_HOST),
                             'port' => config('reverb.servers.reverb.port', 8080),
                             'scheme' => config('reverb.servers.reverb.options.scheme', 'http'),
                         ], $app->metadata ?? []),
-                        'allowed_origins' => ['*'], // You can make this configurable per app
-                        'ping_interval' => 60,
-                        'max_message_size' => 10_000,
-                        'max_connections' => $app->max_connections,
-                    ];
+                    );
                 });
         });
     }

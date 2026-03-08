@@ -38,7 +38,7 @@ const form = useForm({
 })
 
 const submit = () => {
-    form.put(ApplicationRoutes.update.url({ params: { application: props.application.id } }))
+    form.put(ApplicationRoutes.update.url({ application: props.application.id }))
 }
 </script>
 
@@ -52,16 +52,14 @@ const submit = () => {
                     Edit Application
                 </h2>
                 <Link
-                    :href="ApplicationRoutes.show.url({ params: { application: application.id } })"
+                    :href="ApplicationRoutes.show.url({ application: application.id })"
                     class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                 >
                     Back to Application
                 </Link>
             </div>
 
-            <div>
-            <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                     <form @submit.prevent="submit" class="p-6 space-y-6">
                         <!-- Name -->
                         <div>
@@ -163,7 +161,7 @@ const submit = () => {
                         <!-- Actions -->
                         <div class="flex items-center justify-end gap-4">
                             <Link
-                                :href="ApplicationRoutes.show.url({ params: { application: application.id } })"
+                                :href="ApplicationRoutes.show.url({ application: application.id })"
                                 class="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                             >
                                 Cancel
@@ -179,7 +177,6 @@ const submit = () => {
                         </div>
                     </form>
                 </div>
-            </div>
         </div>
     </AppLayout>
 </template>

@@ -50,7 +50,7 @@ const copyToClipboard = (text: string) => {
 
 const deleteApplication = () => {
     if (confirm('Are you sure you want to delete this application? This action cannot be undone.')) {
-        router.delete(ApplicationRoutes.destroy.url({ params: { application: props.application.id } }))
+        router.delete(ApplicationRoutes.destroy.url({ application: props.application.id }))
     }
 }
 
@@ -70,7 +70,7 @@ const toggleStatus = () => {
                 </h2>
                 <div class="flex items-center gap-3">
                     <Link
-                        :href="ApplicationRoutes.edit.url({ params: { application: application.id } })"
+                        :href="ApplicationRoutes.edit.url({ application: application.id })"
                         class="text-sm text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                     >
                         Edit
@@ -84,9 +84,7 @@ const toggleStatus = () => {
                 </div>
             </div>
 
-            <div>
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
-                <!-- Application Details -->
+            <!-- Application Details -->
                 <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between mb-6">
@@ -226,7 +224,6 @@ const toggleStatus = () => {
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     </AppLayout>
 </template>

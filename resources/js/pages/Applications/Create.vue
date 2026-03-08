@@ -43,9 +43,7 @@ const submit = () => {
                 </Link>
             </div>
 
-            <div>
-            <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                     <form @submit.prevent="submit" class="p-6 space-y-6">
                         <!-- Name -->
                         <div>
@@ -194,7 +192,6 @@ const submit = () => {
                         </div>
                     </form>
                 </div>
-            </div>
         </div>
     </AppLayout>
 </template>
