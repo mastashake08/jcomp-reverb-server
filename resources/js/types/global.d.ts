@@ -1,9 +1,14 @@
 import type { Auth } from '@/types/auth';
+import type Echo from 'laravel-echo';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
     interface ImportMetaEnv {
         readonly VITE_APP_NAME: string;
+        readonly VITE_REVERB_APP_KEY: string;
+        readonly VITE_REVERB_HOST: string;
+        readonly VITE_REVERB_PORT: string;
+        readonly VITE_REVERB_SCHEME: string;
         [key: string]: string | boolean | undefined;
     }
 
@@ -29,5 +34,13 @@ declare module 'vue' {
         $inertia: typeof Router;
         $page: Page;
         $headManager: ReturnType<typeof createHeadManager>;
+    }
+}
+
+// Declare global window types
+declare global {
+    interface Window {
+        Echo: Echo;
+        Pusher: any;
     }
 }
