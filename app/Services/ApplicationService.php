@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Broadcasting\Reverb\DatabaseApplicationProvider;
 use App\Events\ApplicationStatusChanged;
 use App\Models\Application;
 use Illuminate\Support\Str;
@@ -42,7 +43,12 @@ class ApplicationService
         $data['app_key'] = $data['app_key'] ?? $this->generateAppKey();
         $data['app_secret'] = Crypt::encryptString($data['app_secret'] ?? $this->generateAppSecret());
 
-        return Application::create($data);
+        $application = Application::create($data);
+        
+        // Clear Reverb's application cache
+        $this->clearReverbCache();
+        
+        return $application;
     }
 
     /**
@@ -61,6 +67,9 @@ class ApplicationService
         }
 
         $application->update($data);
+        
+        // Clear Reverb's application cache
+        $this->clearReverbCache();
 
         return $application->fresh();
     }
@@ -70,7 +79,14 @@ class ApplicationService
      */
     public function deleteApplication(Application $application): bool
     {
-        return $application->delete();
+        $deleted = $application->delete();
+        
+        // Clear Reverb's application cache
+        if ($deleted) {
+            $this->clearReverbCache();
+        }
+        
+        return $deleted;
     }
 
     /**
@@ -159,5 +175,19 @@ class ApplicationService
             'error' => Application::where('status', 'error')->count(),
             'maintenance' => Application::where('status', 'maintenance')->count(),
         ];
+    }
+    
+    /**
+     * Clear Reverb's application cache.
+     */
+    protected function clearReverbCache(): void
+    {
+        try {
+            $provider = app(DatabaseApplicationProvider::class);
+            $provider->clearCache();
+        } catch (\Exception $e) {
+            // Log error but don't fail the operation
+            \Log::warning('Failed to clear Reverb cache: ' . $e->getMessage());
+        }
     }
 }
