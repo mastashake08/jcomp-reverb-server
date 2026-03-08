@@ -1,53 +1,317 @@
-# Reverb Multiapplication Manager - Setup Guide
+# Reverb Manager
 
-This application is a Laravel Reverb-powered multiapplication manager that allows you to monitor and manage multiple Laravel applications with real-time WebSocket communication and performance tracking via Laravel Pulse.
+**Reverb Manager** is a powerful Laravel-based application for managing multiple WebSocket applications through a centralized dashboard. Built on Laravel Reverb and enhanced with Laravel Pulse monitoring, it provides a complete solution for managing real-time application credentials, monitoring connections, and tracking performance metrics.
 
-## Prerequisites
+## 🚀 What is Reverb Manager?
 
-- PHP 8.2+
-- Composer
-- Node.js 18+ & npm
-- SQLite (or MySQL/PostgreSQL)
+Reverb Manager solves the challenge of managing multiple Laravel Reverb applications from a single control panel. Instead of manually configuring WebSocket credentials across different projects, Reverb Manager:
 
-## Installation Steps
+- **Centralized Application Management**: Create and manage multiple Reverb applications with unique credentials
+- **Dynamic Configuration**: Applications are stored in a database and loaded dynamically (no config file editing)
+- **Real-time Monitoring**: Track application status, connection counts, and health metrics
+- **Secure Credentials**: Encrypted storage of application secrets with easy credential rotation
+- **Performance Tracking**: Integrated Laravel Pulse for monitoring WebSocket performance
+- **Type-Safe Routing**: Built with Laravel Wayfinder for fully type-safe route generation
+
+## 🎯 Key Features
+
+### Application Management
+- Create, edit, and delete Reverb applications
+- Auto-generate secure App IDs, Keys, and Secrets
+- Configure max connections per application
+- Enable/disable applications without deletion
+- Soft delete support for application recovery
+
+### Real-time Updates
+- Live application status updates via WebSocket
+- Broadcasting events for application state changes
+- Automatic cache invalidation when applications are modified
+
+### Security
+- Encrypted application secrets in database
+- Authentication required for all management actions
+- Per-application access control
+- Secure credential display with copy-to-clipboard functionality
+
+### Developer Experience
+- Vue 3 + TypeScript frontend with full type safety
+- Service-oriented architecture in Laravel backend
+- Comprehensive REST API for application management
+- Detailed documentation and integration guides
+
+## 📋 Prerequisites
+
+- **PHP**: 8.2 or higher
+- **Composer**: Latest version
+- **Node.js**: 18+ with npm
+- **Database**: SQLite (development) or MySQL/PostgreSQL (production)
+- **Laravel**: 12.x
+
+## 🔧 Installation
 
 ### 1. Install Dependencies
 
 ```bash
-# Install PHP dependencies
+# PHP dependencies
 composer install
 
-# Install Node dependencies
+# Node dependencies
 npm install
 
-# Install Laravel Echo for real-time features
+# Laravel Echo for WebSocket client
 npm install --save laravel-echo pusher-js
 ```
 
-### 2. Configure Environment
+### 2. Environment Setup
 
-Make sure your `.env` file has the following configurations:
+Copy `.env.example` to `.env` and configure:
 
 ```env
-# Database (SQLite for development)
+# Database
 DB_CONNECTION=sqlite
 
-# Reverb Configuration
+# Broadcasting
 BROADCAST_CONNECTION=reverb
+REVERB_APP_PROVIDER=database  # Use database instead of config file
+
+# Reverb Server Configuration
 REVERB_APP_ID=your-app-id
 REVERB_APP_KEY=your-app-key
 REVERB_APP_SECRET=your-app-secret
-REVERB_HOST="localhost"
+REVERB_HOST=localhost
 REVERB_PORT=8080
 REVERB_SCHEME=http
 
-# Vite Reverb Configuration
+# Vite Configuration
 VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
 VITE_REVERB_HOST="${REVERB_HOST}"
 VITE_REVERB_PORT="${REVERB_PORT}"
 VITE_REVERB_SCHEME="${REVERB_SCHEME}"
 
-# Pulse Configuration
+# Pulse Monitoring
+PULSE_ENABLED=true
+```
+
+### 3. Database Setup
+
+```bash
+# Create database
+touch database/database.sqlite
+
+# Run migrations
+php artisan migrate
+
+# (Optional) Seed test data
+php artisan db:seed
+```
+
+### 4. Build Frontend Assets
+
+```bash
+# Development with hot reload
+npm run dev
+
+# Production build
+npm run build
+```
+
+## 🚦 Running the Application
+
+You need to start three services:
+
+```bash
+# Terminal 1: Laravel development server
+php artisan serve
+
+# Terminal 2: Reverb WebSocket server
+php artisan reverb:start
+
+# Terminal 3: Vite development server (if not already running)
+npm run dev
+```
+
+Access the application at `http://localhost:8000`
+
+## 📖 Usage
+
+### Creating Your First Application
+
+1. Log in to Reverb Manager
+2. Navigate to **Applications** → **Create New**
+3. Fill in application details:
+   - **Name**: Your application name
+   - **URL**: Your application URL
+   - **Max Connections**: Maximum concurrent WebSocket connections
+   - **Health Check URL** (optional): Endpoint for health monitoring
+4. Click **Create Application**
+5. Copy the generated credentials (App ID, Key, and Secret)
+
+### Using Generated Credentials
+
+In your client application, configure the Reverb credentials:
+
+```env
+REVERB_APP_ID=<generated-app-id>
+REVERB_APP_KEY=<generated-app-key>
+REVERB_APP_SECRET=<generated-app-secret>
+REVERB_HOST=localhost
+REVERB_PORT=8080
+REVERB_SCHEME=http
+```
+
+### Managing Applications
+
+- **View All**: Dashboard shows all applications with statistics
+- **Edit**: Update application settings (credentials remain unchanged unless regenerated)
+- **Toggle Status**: Enable/disable applications without deletion
+- **Delete**: Soft delete applications (can be recovered)
+- **View Details**: See full credentials and connection information
+
+## 🏗️ Architecture
+
+### Custom Database Provider
+
+Reverb Manager implements a custom `DatabaseApplicationProvider` that replaces Laravel Reverb's default config-based provider. This allows applications to be:
+
+- Stored in a database instead of config files
+- Created and managed through a UI
+- Updated without server restarts
+- Cached for performance (5-minute TTL)
+
+### Service Layer
+
+The `ApplicationService` handles all business logic:
+- Credential generation
+- Application CRUD operations
+- Cache invalidation
+- Broadcasting state changes
+
+### Frontend Architecture
+
+- **Vue 3 Composition API**: Modern reactive components
+- **TypeScript**: Full type safety across the codebase  
+- **Inertia.js**: Seamless SPA experience with Laravel backend
+- **Tailwind CSS 4**: Utility-first styling with dark mode support
+- **Laravel Wayfinder**: Type-safe route generation
+
+## 🔌 Integration Guide
+
+### Connecting Your Laravel App
+
+1. Install Laravel Reverb in your application:
+```bash
+composer require laravel/reverb
+php artisan reverb:install
+```
+
+2. Configure with Reverb Manager credentials:
+```env
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=<from-reverb-manager>
+REVERB_APP_KEY=<from-reverb-manager>
+REVERB_APP_SECRET=<from-reverb-manager>
+REVERB_HOST=<reverb-manager-host>
+REVERB_PORT=8080
+```
+
+3. Your application will now authenticate through Reverb Manager
+
+### Event Broadcasting
+
+Reverb Manager broadcasts these events:
+- `ApplicationStatusChanged`: When application status is toggled
+- Cache clearing triggers after application modifications
+
+## 📊 Monitoring with Pulse
+
+Laravel Pulse integration provides:
+- Real-time connection metrics
+- Message throughput tracking
+- Performance bottleneck identification
+- Historical data analysis
+
+Access Pulse dashboard at `/pulse`
+
+## 🛠️ API Reference
+
+### Application Endpoints
+
+```
+GET    /applications           # List all applications
+GET    /applications/create    # Show create form
+POST   /applications           # Store new application
+GET    /applications/{id}      # Show application details
+GET    /applications/{id}/edit # Show edit form
+PUT    /applications/{id}      # Update application
+DELETE /applications/{id}      # Soft delete application
+POST   /applications/{id}/toggle-status  # Enable/disable
+```
+
+## 🔐 Security Best Practices
+
+1. **Environment Variables**: Never commit `.env` files
+2. **Secret Rotation**: Regularly regenerate application secrets
+3. **Access Control**: Restrict dashboard access to authorized users
+4. **HTTPS in Production**: Always use TLS for WebSocket connections
+5. **Database Encryption**: Application secrets are encrypted at rest
+
+## 📚 Additional Documentation
+
+- [REVERB_INTEGRATION.md](REVERB_INTEGRATION.md): Deep dive into the custom provider architecture
+- [.instructions.md](.instructions.md): Copilot AI instructions for contributing
+
+## 🐛 Troubleshooting
+
+### Applications Not Connecting
+
+```bash
+# Clear application cache
+php artisan cache:forget reverb.applications
+
+# Restart Reverb server
+php artisan reverb:restart
+```
+
+### Database Provider Not Loading
+
+Verify `.env` has:
+```env
+REVERB_APP_PROVIDER=database
+```
+
+### Frontend Build Errors
+
+```bash
+# Rebuild node_modules
+rm -rf node_modules package-lock.json
+npm install
+
+# Clear Vite cache
+rm -rf node_modules/.vite
+npm run dev
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read the contribution guidelines before submitting pull requests.
+
+## 📝 License
+
+This project is open-sourced software licensed under the MIT license.
+
+## 🙏 Credits
+
+Built with:
+- [Laravel 12](https://laravel.com)
+- [Laravel Reverb](https://reverb.laravel.com)
+- [Laravel Pulse](https://pulse.laravel.com)
+- [Vue 3](https://vuejs.org)
+- [Inertia.js](https://inertiajs.com)
+- [Tailwind CSS](https://tailwindcss.com)
+
+---
+
+**Reverb Manager** - Simplifying WebSocket application management for Laravel developers.
 PULSE_ENABLED=true
 ```
 
