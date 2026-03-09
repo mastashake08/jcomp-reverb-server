@@ -65,6 +65,16 @@ class Application extends Model
     }
 
     /**
+     * Get the decrypted secret for display purposes.
+     */
+    protected function decryptedSecret(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->app_secret,
+        );
+    }
+
+    /**
      * Scope a query to only include active applications.
      */
     public function scopeActive($query)

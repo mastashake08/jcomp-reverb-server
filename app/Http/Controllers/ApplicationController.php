@@ -47,8 +47,12 @@ class ApplicationController extends Controller
             $request->validated()
         );
 
+        // Show the secret immediately after creation
+        $application->append('decrypted_secret');
+
         return redirect()->route('applications.show', $application)
-            ->with('success', 'Application created successfully.');
+            ->with('success', 'Application created successfully.')
+            ->with('showSecret', true);
     }
 
     /**
@@ -56,6 +60,9 @@ class ApplicationController extends Controller
      */
     public function show(Application $application): Response
     {
+        // Include decrypted secret for viewing
+        $application->append('decrypted_secret');
+
         return Inertia::render('Applications/Show', [
             'application' => $application,
         ]);

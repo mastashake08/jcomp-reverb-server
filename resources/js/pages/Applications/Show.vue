@@ -13,6 +13,7 @@ interface Application {
     health_check_url?: string
     app_id: string
     app_key: string
+    decrypted_secret?: string
     status: 'active' | 'inactive' | 'error' | 'maintenance'
     is_enabled: boolean
     max_connections: number
@@ -193,9 +194,27 @@ const toggleStatus = () => {
                                     </button>
                                 </div>
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">App Secret</label>
+                                <div class="mt-1 flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        :value="application.decrypted_secret || '••••••••••••••••••••'"
+                                        readonly
+                                        class="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 sm:text-sm font-mono"
+                                    />
+                                    <button
+                                        v-if="application.decrypted_secret"
+                                        @click="copyToClipboard(application.decrypted_secret)"
+                                        class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-100 dark:ring-gray-600 dark:hover:bg-gray-600"
+                                    >
+                                        Copy
+                                    </button>
+                                </div>
+                            </div>
                             <div class="rounded-md bg-yellow-50 p-4 dark:bg-yellow-900/20">
                                 <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                                    <strong>Note:</strong> The App Secret is encrypted and cannot be displayed. Store it securely when first created.
+                                    <strong>Security Note:</strong> Store this secret securely. It provides full access to your WebSocket application.
                                 </p>
                             </div>
                         </div>
