@@ -69,7 +69,7 @@ return [
 
     'apps' => [
 
-        'provider' => env('REVERB_APP_PROVIDER', 'config'),
+        'provider' => env('REVERB_APP_PROVIDER', 'database'),
 
         'apps' => [
             [
