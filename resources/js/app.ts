@@ -4,6 +4,7 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import '../css/app.css';
 import { initializeTheme } from '@/composables/useAppearance';
+import './echo';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

@@ -8,6 +8,8 @@ Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
 
+Route::inertia('/reverb-test', 'ReverbTest')->name('reverb.test');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return redirect()->route('applications.index');
