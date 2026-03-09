@@ -13,10 +13,12 @@ class ReverbServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Register the custom database application provider
-        $this->app->singleton(ApplicationProvider::class, function ($app) {
-            return new DatabaseApplicationProvider();
-        });
+        // Only register the custom database application provider when configured
+        if (config('reverb.apps.provider') === 'database') {
+            $this->app->singleton(ApplicationProvider::class, function ($app) {
+                return new DatabaseApplicationProvider();
+            });
+        }
     }
 
     /**
